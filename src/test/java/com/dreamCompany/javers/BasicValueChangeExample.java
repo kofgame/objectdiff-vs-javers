@@ -1,15 +1,10 @@
 package com.dreamCompany.javers;
 
 import com.dreamCompany.model.Address;
-import com.dreamCompany.model.Employee;
-import com.google.common.collect.Sets;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.changetype.container.CollectionChange;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

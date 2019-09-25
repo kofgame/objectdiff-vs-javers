@@ -1,17 +1,21 @@
-package com.dreamCompany.javers;
+package com.dreamCompany.javers.diff;
 
-import com.dreamCompany.model.Address;
-import com.dreamCompany.model.Employee;
-import com.google.common.collect.Sets;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.ListCompareAlgorithm;
+import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.CollectionChange;
+import org.javers.core.diff.changetype.container.SetChange;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.dreamCompany.model.Address;
+import com.dreamCompany.model.Employee;
+import com.google.common.collect.Sets;
 
 /**
  * Created by Andrey on 24.09.2019.
@@ -46,6 +50,14 @@ public class SimpleContainerChangeExample {
         CollectionChange containerChange = diff.getChangesByType(CollectionChange.class).get(0);
 
         assertThat(diff.getChanges()).hasSize(5);
+        assertThat(diff.getChanges())
+            .hasOnlyElementsOfTypes(
+                NewObject.class,        // 2 items - address2 & address3
+                ObjectRemoved.class,    // address1
+                ValueChange.class,      // employee1 to employee2
+                SetChange.class
+            );
+
         assertThat(valueChange.getPropertyName()).isEqualTo("name");
 
         System.out.println("<--- Changes: \n" + diff.getChanges() + " \n --->");

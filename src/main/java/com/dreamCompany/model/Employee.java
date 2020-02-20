@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.javers.core.metamodel.annotation.Entity;
-import org.javers.core.metamodel.annotation.Id;
 
 import com.google.common.collect.Sets;
 
@@ -25,11 +24,14 @@ public class Employee {
         this.salary = salary;
     }
 
-    public Employee(final String name) {
-        this.name = name;
-    }
+//    public Employee(final String name, final String position, final int salary, final Set<Address> addresses) {
+//        this.name = name;
+//        this.position = position;
+//        this.salary = salary;
+//        this.addresses = addresses;
+//    }
 
-    @Id // notice javers metadata
+    @org.javers.core.metamodel.annotation.Id // notice javers metadata
     private String name;
     private String position;
 

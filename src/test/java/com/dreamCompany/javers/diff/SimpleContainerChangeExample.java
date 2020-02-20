@@ -8,7 +8,6 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.CollectionChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.junit.Test;
@@ -23,7 +22,7 @@ import com.google.common.collect.Sets;
 public class SimpleContainerChangeExample {
 
     @Test
-    public void shouldCaptureContainerChange() {
+    public void shouldCaptureNewAndRemovedChanges() {
         // given
         Javers javers = JaversBuilder.javers()
                 .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
@@ -33,32 +32,49 @@ public class SimpleContainerChangeExample {
         Address address2 = new Address("New York","6th Avenue");
         Address address3 = new Address("New York","7th Avenue");
 
-        Employee employee1 = Employee.builder().name("employee1")
-                .position("accountant")
-                .addresses(Sets.newHashSet(address1))
-                .build();
-        Employee employee2 = Employee.builder().name("employee2")
-                .position("accountant")
-                .addresses(Sets.newHashSet(address2, address3))
-                .build();
+        Employee employee1 = new Employee("employee1", "accountant", 5000, Sets.newHashSet(address1));
+        Employee employee2 = new Employee("employee2", "accountant", 5000, Sets.newHashSet(address2, address3));
 
         // compare
         Diff diff = javers.compare(employee1, employee2);
-
-        //there should be one change of ValueChange type & 3 changes of CollectionChange type
-        ValueChange valueChange = diff.getChangesByType(ValueChange.class).get(0);
-        CollectionChange containerChange = diff.getChangesByType(CollectionChange.class).get(0);
 
         assertThat(diff.getChanges()).hasSize(5);
         assertThat(diff.getChanges())
             .hasOnlyElementsOfTypes(
                 NewObject.class,        // 2 items - address2 & address3
-                ObjectRemoved.class,    // address1
-                ValueChange.class,      // employee1 to employee2
-                SetChange.class
+                ObjectRemoved.class
             );
+        System.out.println("<--- Changes: \n" + diff.getChanges() + " \n --->");
+    }
 
-        assertThat(valueChange.getPropertyName()).isEqualTo("name");
+
+    @Test
+    public void shouldCaptureContainerChange() {
+        // given
+        Javers javers = JaversBuilder.javers()
+            .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
+            .build();
+
+        Address address1 = new Address("New Orlean", "5th Avenue");
+        Address address2 = new Address("New York","6th Avenue");
+        Address address3 = new Address("New Jersey","7th Avenue");
+
+        // compare
+        Diff diff = javers.compareCollections(
+            Sets.newHashSet(address1),
+            Sets.newHashSet(address2, address3),
+            Address.class);
+
+        // there should be 2 changes of NewObject type & 1 change of CollectionChange type
+        CollectionChange containerChange = diff.getChangesByType(CollectionChange.class).get(0);
+
+        assertThat(diff.getChanges()).hasSize(4);
+        assertThat(diff.getChanges())
+            .hasOnlyElementsOfTypes(
+                NewObject.class,        // 2 items - address2 & address3
+                ObjectRemoved.class,    // 1 item - address1
+                SetChange.class         // 'set' collection change
+            );
 
         System.out.println("<--- Changes: \n" + diff.getChanges() + " \n --->");
         assertThat(containerChange.getChanges().size()).isEqualTo(3);

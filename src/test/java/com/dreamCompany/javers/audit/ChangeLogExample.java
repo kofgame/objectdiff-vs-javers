@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.dreamCompany.model.Address;
 import com.dreamCompany.model.Employee;
+import com.google.common.collect.Sets;
 
 /**
  * Created by Andrey on 24.09.2019.
@@ -25,8 +26,9 @@ public class ChangeLogExample {
     public void verifyCaptureChangeLog() {
         Javers javers = JaversBuilder.javers().build();
 
-        // NOTE: for JAVERS to capture audit / changelog entities must be annotated with JAVERS {@link Entity}
+        // NOTE: for JAVERS to capture audit / changelog entities must be annotated with JAVERS metadata, like Entity, Id etc
         Employee bob = new Employee("Bob", "ProjectManager", 5_000);
+        bob.withAddresses(Sets.newHashSet());
         javers.commit("hr.manager", bob);
 
         // do some changes and commit
